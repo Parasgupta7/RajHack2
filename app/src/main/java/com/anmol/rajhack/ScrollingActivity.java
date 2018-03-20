@@ -9,9 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,99 +31,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScrollingActivity extends AppCompatActivity {
-
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
     private CustomAdapter adapter;
     private List<MyData> data_list;
-
-
-
-
-
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_scrolling, container, false);
-
-
-
-
-
-        return rootView;
-    }
-
+    RequestQueue requestQueue;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
-        data_list  = new ArrayList<>();
-        load_data_from_server(0);
+     //   getActivity().setTitle("products");
 
-        gridLayoutManager = new GridLayoutManager(getActivity(),2);
-        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        data_list = new ArrayList<>();
 
-        adapter = new CustomAdapter(getActivity(),data_list);
-        recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        requestQueue = Volley.newRequestQueue(getActivity());
+        JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET, "https://rajhack-92913.firebaseio.com/Data.json", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
 
-                if(gridLayoutManager.findLastCompletelyVisibleItemPosition() == data_list.size()-1){
-                    load_data_from_server(data_list.get(data_list.size()-1).getId());
-                }
 
-            }
-        });
-    }
-
-    private void load_data_from_server(int id) {
-
-        AsyncTask<Integer,Void,Void> task = new AsyncTask<Integer, Void, Void>() {
-            @Override
-            protected Void doInBackground(Integer... integers) {
-
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url("http://helloabc.000webhostapp.com/internships.php?id="+integers[0])
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-
-                    JSONArray array = new JSONArray(response.body().string());
-
-                    for (int i=0; i<array.length(); i++){
-
-                        JSONObject object = array.getJSONObject(i);
-
-                        MyData data = new MyData(object.getInt("id"),object.getString("description"),
-                                object.getString("image"));
-
-                        data_list.add(data);
+                            for(int i=1;i<10;i++) {
+                                JSONObject ja = response.getJSONObject("Data" + i);
+                                String d = ja.getString("Description");
+                                String im = ja.getString("Image");
+                                String t = ja.getString("Title");
+                                Log.e(im, d);
+                                MyData data = new MyData(t, d, im);
+                                data_list.add(data);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }catch(JSONException e){
+                            e.printStackTrace();}
                     }
-
-
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    System.out.println("End of content");
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Log.e("Volley","Error");
+                    }
                 }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                adapter.notifyDataSetChanged();
-            }
-        };
-
-        task.execute(id);
+        );
+        requestQueue.add(jor);
+        gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        adapter = new CustomAdapter(getActivity(), data_list);
+        recyclerView.setAdapter(adapter);
     }
-
-
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.activity_scrolling, container, false);
+        //return inflater.inflate(R.layout.fragment_products, container, false);
+        return rootView;
+    }
+/*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,4 +107,5 @@ public class ScrollingActivity extends AppCompatActivity {
             }
         });
     }
+  */
 }

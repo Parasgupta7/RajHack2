@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 /**
@@ -17,6 +19,7 @@ import java.util.List;
  */
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
+
 
     private Context context;
     private List<MyData> my_data;
@@ -39,22 +42,25 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position){
 
-        holder.description.setText(my_data.get(position).getDescription());
-        Glide.with(context).load(my_data.get(position).getImage_link()).into(holder.imageView);
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
+
+        holder.Description.setText(my_data.get(position).getDescription());
+        holder.Title.setText(my_data.get(position).getTitle());
+        Picasso.with(context).load(my_data.get(position).getImage()).into(holder.Image);
+        //Glide.with(context).load(my_data.get(position).getImage()).into(holder.Image);
+        /*holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Toast.makeText(view.getContext(),"clicked at"+holder.getAdapterPosition(),Toast.LENGTH_LONG).show();
 
                 if(my_data.get(position).getId()==(int)my_data.get(position).getId()){
                     Toast.makeText(view.getContext(),"clicked at"+holder.getAdapterPosition(), Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(view.getContext(),Aditi.class);
+                    Intent i = new Intent(view.getContext(),descrip.class);
                     i.putExtra("desc",my_data.get(position).getDescription());
                     view.getContext().startActivity(i);
 
                 }
             }
-        });
+        });*/
 
 
 
@@ -68,13 +74,16 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     public  class ViewHolder extends  RecyclerView.ViewHolder{
 
-        public TextView description;
-        public ImageView imageView;
+        public TextView Description;
+        public ImageView Image;
+        public TextView Title;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
-            //description = (TextView) itemView.findViewById(R.id.description);
-            imageView = (ImageView) itemView.findViewById(R.id.image);
+            Title = (TextView) itemView.findViewById(R.id.title);
+            Description = (TextView) itemView.findViewById(R.id.description);
+            Image = (ImageView) itemView.findViewById(R.id.image);
 
         }
     }

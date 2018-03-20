@@ -22,7 +22,8 @@
         <activity
             android:name=".ScrollingActivity"
             android:label="Lesser Known Places"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".descrip"></activity>
     </application>
 
 </manifest>
